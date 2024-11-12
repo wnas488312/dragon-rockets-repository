@@ -4,6 +4,7 @@ import org.wn.rockets.dto.MissionSummaryDto;
 import org.wn.rockets.entity.MissionStatus;
 import org.wn.rockets.exception.AlreadyPresentInStoreException;
 import org.wn.rockets.exception.NotFoundException;
+import org.wn.rockets.exception.WrongStatusException;
 
 import java.util.List;
 
@@ -21,11 +22,16 @@ public interface MissionRepository {
 
     /**
      * Changes status of a mission stored in repository.
+     * If changing status to "Pending", at least one rocket needs to be assigned to mission.
+     * If changing status to "In Progress", at least one rocket needs to be assigned to mission,
+     * and none of them should be "In Repair" stage.
+     * If changing status to "Ended", avery rocket assigned to this mission will be unassigned.
      * @param missionName   Name of a mission to be updated.
      * @param status        Status of a mission to be set.
      * @throws NotFoundException when mission with given name does not exist in the repository.
+     * @throws WrongStatusException when trying to change status, and precondition failed.
      */
-    void changeMissionStatus(String missionName, MissionStatus status) throws NotFoundException;
+    void changeMissionStatus(String missionName, MissionStatus status) throws NotFoundException, WrongStatusException;
 
     /**
      * Gets data about every mission in repository with rockets data assigned to their missions.

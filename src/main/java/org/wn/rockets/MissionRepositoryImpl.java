@@ -8,16 +8,22 @@ import org.wn.rockets.dto.MissionSummaryDto;
 import org.wn.rockets.entity.MissionStatus;
 import org.wn.rockets.exception.AlreadyPresentInStoreException;
 import org.wn.rockets.exception.NotFoundException;
+import org.wn.rockets.exception.WrongStatusException;
 
 import java.util.List;
 
 public class MissionRepositoryImpl implements MissionRepository {
     private final RocketsDao rocketsDao;
-    private final MissionsDao missinsDao;
+    private final MissionsDao missionsDao;
 
     public MissionRepositoryImpl() {
         rocketsDao = InMemoryRocketsDao.getInstance();
-        missinsDao = InMemoryMissionsDao.getInstance();
+        missionsDao = InMemoryMissionsDao.getInstance();
+    }
+
+    public MissionRepositoryImpl(RocketsDao rocketsDao, MissionsDao missionsDao) {
+        this.rocketsDao = rocketsDao;
+        this.missionsDao = missionsDao;
     }
 
     /**
@@ -32,7 +38,7 @@ public class MissionRepositoryImpl implements MissionRepository {
      * {@inheritDoc}
      */
     @Override
-    public void changeMissionStatus(String missionName, MissionStatus status) throws NotFoundException {
+    public void changeMissionStatus(String missionName, MissionStatus status) throws NotFoundException, WrongStatusException {
         // TODO: Implementation
     }
 

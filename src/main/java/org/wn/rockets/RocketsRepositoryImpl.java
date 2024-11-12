@@ -12,11 +12,21 @@ import java.util.List;
 
 public class RocketsRepositoryImpl implements RocketsRepository {
     private final RocketsDao rocketsDao;
-    private final MissionsDao missinsDao;
+    private final MissionsDao missionsDao;
 
     public RocketsRepositoryImpl() {
         rocketsDao = InMemoryRocketsDao.getInstance();
-        missinsDao = InMemoryMissionsDao.getInstance();
+        missionsDao = InMemoryMissionsDao.getInstance();
+    }
+
+    /**
+     * Constructor used when there is a need to override dependencies
+     * @param rocketsDao    DAO object for rockets
+     * @param missionsDao   DAO object for missions
+     */
+    public RocketsRepositoryImpl(RocketsDao rocketsDao, MissionsDao missionsDao) {
+        this.rocketsDao = rocketsDao;
+        this.missionsDao = missionsDao;
     }
 
     /**
