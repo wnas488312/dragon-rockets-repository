@@ -6,6 +6,7 @@ import org.wn.rockets.entity.MissionEntity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InMemoryMissionsDao implements MissionsDao {
     private Map<String, MissionEntity> store;
@@ -15,6 +16,14 @@ public class InMemoryMissionsDao implements MissionsDao {
 
     private InMemoryMissionsDao() {
         store = new HashMap<>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<MissionEntity> find(String identifier) {
+        return Optional.ofNullable(store.get(identifier));
     }
 
     /**

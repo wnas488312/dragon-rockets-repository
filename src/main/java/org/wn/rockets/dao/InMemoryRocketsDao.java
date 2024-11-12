@@ -3,12 +3,9 @@ package org.wn.rockets.dao;
 import lombok.Getter;
 import org.wn.rockets.entity.RocketEntity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-public class InMemoryRocketsDao implements RocketsDao{
+public class InMemoryRocketsDao implements RocketsDao {
     private Map<String, RocketEntity> store;
 
     @Getter
@@ -16,6 +13,14 @@ public class InMemoryRocketsDao implements RocketsDao{
 
     private InMemoryRocketsDao() {
         store = new HashMap<>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RocketEntity> find(String identifier) {
+        return Optional.ofNullable(store.get(identifier));
     }
 
     /**

@@ -2,12 +2,11 @@ package org.wn.rockets.dao;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.wn.rockets.entity.MissionEntity;
-import org.wn.rockets.entity.MissionStatus;
 import org.wn.rockets.entity.RocketEntity;
 import org.wn.rockets.entity.RocketStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,6 +24,21 @@ class InMemoryRocketsDaoTest {
         final InMemoryRocketsDao instance2 = InMemoryRocketsDao.getInstance();
 
         assertEquals(instance1, instance2);
+    }
+
+    @Test
+    void findTest() {
+        final RocketEntity rocketEntity = new RocketEntity("Dragon 1", RocketStatus.ON_GROUND, "Mars");
+        rocketsDao.save(rocketEntity);
+
+        final Optional<RocketEntity> found = rocketsDao.find(rocketEntity.rocketName());
+        assertTrue(found.isPresent());
+    }
+
+    @Test
+    void find_emptyTest() {
+        final Optional<RocketEntity> found = rocketsDao.find("Not found");
+        assertTrue(found.isEmpty());
     }
 
     @Test

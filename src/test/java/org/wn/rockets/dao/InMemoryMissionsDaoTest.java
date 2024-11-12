@@ -4,10 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.wn.rockets.entity.MissionEntity;
 import org.wn.rockets.entity.MissionStatus;
-import org.wn.rockets.entity.RocketEntity;
-import org.wn.rockets.entity.RocketStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,6 +24,21 @@ class InMemoryMissionsDaoTest {
         final InMemoryMissionsDao instance2 = InMemoryMissionsDao.getInstance();
 
         assertEquals(instance1, instance2);
+    }
+
+    @Test
+    void findTest() {
+        final MissionEntity missionEntity = new MissionEntity("Mars", MissionStatus.SCHEDULED);
+        missionsDao.save(missionEntity);
+
+        final Optional<MissionEntity> found = missionsDao.find(missionEntity.missionName());
+        assertTrue(found.isPresent());
+    }
+
+    @Test
+    void find_emptyTest() {
+        final Optional<MissionEntity> found = missionsDao.find("Not found");
+        assertTrue(found.isEmpty());
     }
 
     @Test
