@@ -6,9 +6,10 @@ import org.wn.rockets.entity.RocketEntity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class InMemoryRocketsDao implements RocketsDao{
-    private final Map<String, RocketEntity> store;
+    private Map<String, RocketEntity> store;
 
     @Getter
     private static final InMemoryRocketsDao instance = new InMemoryRocketsDao();
@@ -22,7 +23,8 @@ public class InMemoryRocketsDao implements RocketsDao{
      */
     @Override
     public void save(RocketEntity rocket) {
-        // TODO: actual implementation.
+        final String key = rocket.rocketName();
+        store.put(key, rocket);
     }
 
     /**
@@ -30,8 +32,10 @@ public class InMemoryRocketsDao implements RocketsDao{
      */
     @Override
     public List<RocketEntity> getRocketsByMissionName(String missionName) {
-        // TODO: actual implementation.
-        return List.of();
+        return store.values()
+                .stream()
+                .filter(rocket -> Objects.equals(missionName, rocket.assignedMissionName()))
+                .toList();
     }
 
     /**
@@ -39,6 +43,6 @@ public class InMemoryRocketsDao implements RocketsDao{
      */
     @Override
     public void removeAll() {
-        // TODO: actual implementation.
+        store = new HashMap<>();
     }
 }

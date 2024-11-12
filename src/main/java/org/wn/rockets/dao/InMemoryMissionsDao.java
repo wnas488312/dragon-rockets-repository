@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryMissionsDao implements MissionsDao {
-    private final Map<String, MissionEntity> store;
+    private Map<String, MissionEntity> store;
 
     @Getter
     private static final InMemoryMissionsDao instance = new InMemoryMissionsDao();
@@ -22,7 +22,8 @@ public class InMemoryMissionsDao implements MissionsDao {
      */
     @Override
     public void save(MissionEntity entity) {
-        // TODO: actual implementation.
+        final String key = entity.missionName();
+        store.put(key, entity);
     }
 
     /**
@@ -30,8 +31,9 @@ public class InMemoryMissionsDao implements MissionsDao {
      */
     @Override
     public List<MissionEntity> getAll() {
-        // TODO: actual implementation.
-        return List.of();
+        return store.values()
+                .stream()
+                .toList();
     }
 
     /**
@@ -39,6 +41,6 @@ public class InMemoryMissionsDao implements MissionsDao {
      */
     @Override
     public void removeAll() {
-        // TODO: actual implementation.
+        store = new HashMap<>();
     }
 }
