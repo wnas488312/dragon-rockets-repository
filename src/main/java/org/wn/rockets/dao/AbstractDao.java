@@ -11,4 +11,9 @@ public interface AbstractDao<Entity> {
      * @param entity Objects with data.
      */
     void save(Entity entity);
+
+    /**
+     * Removes every entity present in the store.
+     */
+    void removeAll();
 }

@@ -33,4 +33,12 @@ public class InMemoryMissionsDao implements MissionsDao {
         // TODO: actual implementation.
         return List.of();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAll() {
+        // TODO: actual implementation.
+    }
 }
