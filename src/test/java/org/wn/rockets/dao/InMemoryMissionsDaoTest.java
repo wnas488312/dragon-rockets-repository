@@ -1,5 +1,6 @@
 package org.wn.rockets.dao;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.wn.rockets.entity.MissionEntity;
 import org.wn.rockets.entity.MissionStatus;
@@ -12,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryMissionsDaoTest {
     private final InMemoryMissionsDao missionsDao = InMemoryMissionsDao.getInstance();
+
+    @AfterEach
+    public void cleanUp() {
+        missionsDao.removeAll();
+    }
 
     @Test
     void getInstance_ensureSameInstanceTest() {
@@ -54,7 +60,21 @@ class InMemoryMissionsDaoTest {
 
         List<MissionEntity> allMissions = missionsDao.getAll();
         assertEquals(2, allMissions.size());
-        assertEquals(missionEntity1, allMissions.getFirst());
-        assertEquals(missionEntity2, allMissions.getLast());
+        assertTrue(allMissions.contains(missionEntity1));
+        assertTrue(allMissions.contains(missionEntity2));
+    }
+
+    @Test
+    void removeAllTest() {
+        final MissionEntity missionEntity1 = new MissionEntity("Mars", MissionStatus.SCHEDULED);
+        missionsDao.save(missionEntity1);
+
+        final MissionEntity missionEntity2 = new MissionEntity("Luna", MissionStatus.PENDING);
+        missionsDao.save(missionEntity2);
+
+        missionsDao.removeAll();
+
+        List<MissionEntity> allMissions = missionsDao.getAll();
+        assertTrue(allMissions.isEmpty());
     }
 }

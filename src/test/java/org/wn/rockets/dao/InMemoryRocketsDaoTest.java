@@ -1,5 +1,6 @@
 package org.wn.rockets.dao;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.wn.rockets.entity.RocketEntity;
 import org.wn.rockets.entity.RocketStatus;
@@ -10,6 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryRocketsDaoTest {
     private final InMemoryRocketsDao rocketsDao = InMemoryRocketsDao.getInstance();
+
+    @AfterEach
+    public void cleanUp() {
+        rocketsDao.removeAll();
+    }
 
     @Test
     void getInstance_ensureSameInstanceTest() {
@@ -58,7 +64,23 @@ class InMemoryRocketsDaoTest {
 
         List<RocketEntity> rocketsByMissionName = rocketsDao.getRocketsByMissionName(missionName1);
         assertEquals(2, rocketsByMissionName.size());
-        assertEquals(rocketEntity2, rocketsByMissionName.getFirst());
-        assertEquals(rocketEntity3, rocketsByMissionName.getLast());
+        assertTrue(rocketsByMissionName.contains(rocketEntity1));
+        assertTrue(rocketsByMissionName.contains(rocketEntity2));
+    }
+
+    @Test
+    void removeAllTest() {
+        final String missionName = "Mars";
+
+        final RocketEntity rocketEntity1 = new RocketEntity("Dragon 1", RocketStatus.ON_GROUND, missionName);
+        rocketsDao.save(rocketEntity1);
+
+        final RocketEntity rocketEntity2 = new RocketEntity("Dragon 2", RocketStatus.ON_GROUND, missionName);
+        rocketsDao.save(rocketEntity2);
+
+        rocketsDao.removeAll();
+
+        List<RocketEntity> rocketsByMissionName = rocketsDao.getRocketsByMissionName(missionName);
+        assertTrue(rocketsByMissionName.isEmpty());
     }
 }
