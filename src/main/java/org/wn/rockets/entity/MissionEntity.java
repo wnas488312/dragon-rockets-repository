@@ -1,7 +1,5 @@
 package org.wn.rockets.entity;
 
-import java.nio.file.Path;
-
 /**
  * Object that stores data about mission.
  * @param missionName   Name of a mission that will be used also as its identifier.
