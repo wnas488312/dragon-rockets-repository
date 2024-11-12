@@ -57,14 +57,16 @@ public class MissionRepositoryImpl implements MissionRepository {
         final MissionEntity missionEntity = getMissionEntityIfPresent(missionName);
 
         final List<RocketEntity> rocketsByMissionName = rocketsDao.getRocketsByMissionName(missionName);
-        if (MissionStatus.PENDING.equals(status) && rocketsByMissionName.isEmpty()) {
+        if (MissionStatus.PENDING.equals(status) &&
+                (rocketsByMissionName.isEmpty() ||
+                        rocketsByMissionName.stream().noneMatch(rocket -> RocketStatus.IN_REPAIR.equals(rocket.status())))) {
             throw new WrongStatusException(
                     String.format("Cannot change status to PENDING if there is no rockets assigned to mission %s", missionName));
         }
 
         if (MissionStatus.IN_PROGRESS.equals(status) &&
                 (rocketsByMissionName.isEmpty() ||
-                rocketsByMissionName.stream().anyMatch(rocket -> RocketStatus.IN_REPAIR.equals(rocket.status())))) {
+                        rocketsByMissionName.stream().anyMatch(rocket -> RocketStatus.IN_REPAIR.equals(rocket.status())))) {
             throw new WrongStatusException(
                     String.format("Cannot change status to IN_PROGRESS if there is no rockets assigned to mission %s or any of them is in repair", missionName));
         }

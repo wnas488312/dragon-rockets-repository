@@ -60,7 +60,7 @@ class MissionRepositoryImplTest {
                 .thenReturn(Optional.of(new MissionEntity(EXAMPLE_MISSION_NAME, MissionStatus.SCHEDULED)));
 
         Mockito.when(rocketsDao.getRocketsByMissionName(EXAMPLE_MISSION_NAME))
-                .thenReturn(List.of(new RocketEntity("Dragon 1", RocketStatus.ON_GROUND, EXAMPLE_MISSION_NAME)));
+                .thenReturn(List.of(new RocketEntity("Dragon 1", RocketStatus.IN_REPAIR, EXAMPLE_MISSION_NAME)));
 
         ArgumentCaptor<MissionEntity> entityArgumentCaptor = ArgumentCaptor.forClass(MissionEntity.class);
         Mockito.doNothing().when(missionsDao).save(entityArgumentCaptor.capture());
