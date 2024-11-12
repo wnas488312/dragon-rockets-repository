@@ -51,7 +51,6 @@ public class InMemoryRocketsDao implements RocketsDao{
      */
     @Override
     public boolean exists(String identifier) {
-        // TODO: Implement
-        return false;
+        return store.containsKey(identifier);
     }
 }
