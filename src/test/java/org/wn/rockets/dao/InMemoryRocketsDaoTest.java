@@ -2,6 +2,8 @@ package org.wn.rockets.dao;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.wn.rockets.entity.MissionEntity;
+import org.wn.rockets.entity.MissionStatus;
 import org.wn.rockets.entity.RocketEntity;
 import org.wn.rockets.entity.RocketStatus;
 
@@ -82,5 +84,19 @@ class InMemoryRocketsDaoTest {
 
         List<RocketEntity> rocketsByMissionName = rocketsDao.getRocketsByMissionName(missionName);
         assertTrue(rocketsByMissionName.isEmpty());
+    }
+
+
+    @Test
+    void exists_existsTest() {
+        final RocketEntity rocketEntity = new RocketEntity("Dragon 1", RocketStatus.ON_GROUND, null);
+        rocketsDao.save(rocketEntity);
+
+        assertTrue(rocketsDao.exists(rocketEntity.rocketName()));
+    }
+
+    @Test
+    void exists_notExistsTest() {
+        assertFalse(rocketsDao.exists("Not exists"));
     }
 }

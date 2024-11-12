@@ -77,4 +77,17 @@ class InMemoryMissionsDaoTest {
         List<MissionEntity> allMissions = missionsDao.getAll();
         assertTrue(allMissions.isEmpty());
     }
+
+    @Test
+    void exists_existsTest() {
+        final MissionEntity missionEntity = new MissionEntity("Mars", MissionStatus.SCHEDULED);
+        missionsDao.save(missionEntity);
+
+        assertTrue(missionsDao.exists(missionEntity.missionName()));
+    }
+
+    @Test
+    void exists_notExistsTest() {
+        assertFalse(missionsDao.exists("Not exists"));
+    }
 }
