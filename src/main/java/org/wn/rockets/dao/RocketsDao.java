@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Interface for data access object for rocket entities. Contains abstraction for storing rockets data.
  */
-public interface RocketsDao extends AbstractDao<RocketEntity>{
+public interface RocketsDao extends AbstractDao<String, RocketEntity>{
 
     /**
      * Gets every stored rocket entity that is assigned for mission with given name.

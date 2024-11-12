@@ -43,4 +43,13 @@ public class InMemoryMissionsDao implements MissionsDao {
     public void removeAll() {
         store = new HashMap<>();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean exists(String identifier) {
+        // TODO: Implement
+        return false;
+    }
 }

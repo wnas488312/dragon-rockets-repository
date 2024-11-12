@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Interface for data access object for mission entities. Contains abstraction for storing missions data.
  */
-public interface MissionsDao extends AbstractDao<MissionEntity> {
+public interface MissionsDao extends AbstractDao<String, MissionEntity> {
 
     /**
      * Gets every stored mission entity.
