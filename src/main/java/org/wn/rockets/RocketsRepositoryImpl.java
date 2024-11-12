@@ -1,5 +1,6 @@
 package org.wn.rockets;
 
+import lombok.extern.log4j.Log4j2;
 import org.wn.rockets.dao.InMemoryMissionsDao;
 import org.wn.rockets.dao.InMemoryRocketsDao;
 import org.wn.rockets.dao.MissionsDao;
@@ -15,6 +16,7 @@ import org.wn.rockets.exception.WrongStatusException;
 import java.util.List;
 import java.util.Objects;
 
+@Log4j2
 public class RocketsRepositoryImpl implements RocketsRepository {
     private final RocketsDao rocketsDao;
     private final MissionsDao missionsDao;
@@ -39,8 +41,11 @@ public class RocketsRepositoryImpl implements RocketsRepository {
      */
     @Override
     public void addNewRocket(String rocketName) throws AlreadyPresentInStoreException {
+        log.info("Adding new rocket with name {}", rocketName);
         if (rocketsDao.exists(rocketName)) {
-            throw new AlreadyPresentInStoreException(String.format("Rocket with name %s is already present in repository.", rocketName));
+            final String errorMessage = String.format("Rocket with name %s is already present in repository.", rocketName);
+            log.error(errorMessage);
+            throw new AlreadyPresentInStoreException(errorMessage);
         }
 
         final RocketEntity newEntity = new RocketEntity(
@@ -49,6 +54,7 @@ public class RocketsRepositoryImpl implements RocketsRepository {
                 null
         );
 
+        log.info("Rocket with name {} added successfully", rocketName);
         rocketsDao.save(newEntity);
     }
 
@@ -57,15 +63,18 @@ public class RocketsRepositoryImpl implements RocketsRepository {
      */
     @Override
     public void assignRocketToMission(String rocketName, String missionName) throws NotFoundException {
+        log.info("Assigning rocket with name {} to {} mission", rocketName, missionName);
         if (!missionsDao.exists(missionName)) {
-            throw new NotFoundException(String.format("Mission with name %s is not present in repository.", missionName));
+            final String errorMessage = String.format("Mission with name %s is not present in repository.", missionName);
+            log.error(errorMessage);
+            throw new NotFoundException(errorMessage);
         }
 
         final RocketEntity rocketEntity = getRocketEntityIfPresent(rocketName);
 
         final RocketEntity updatedRocketEntity = rocketEntity.withAssignedMissionName(missionName);
         rocketsDao.save(updatedRocketEntity);
-
+        log.info("Rocket with name {} is assigned to {} mission", rocketName, missionName);
     }
 
     /**
@@ -83,18 +92,22 @@ public class RocketsRepositoryImpl implements RocketsRepository {
      */
     @Override
     public void changeRocketStatus(String rocketName, RocketStatus status) throws NotFoundException, WrongStatusException {
+        log.info("Changing status of rocket with name {} to {}", rocketName, status.getStatusValue());
         final RocketEntity rocketEntity = getRocketEntityIfPresent(rocketName);
 
         final String assignedMissionName = rocketEntity.assignedMissionName();
 
         if (!RocketStatus.ON_GROUND.equals(status) && Objects.isNull(assignedMissionName)) {
-            throw new WrongStatusException(String.format("Rocket with name %s is not assigned to any mission", rocketName));
+            final String errorMessage = String.format("Rocket with name %s is not assigned to any mission", rocketName);
+            log.error(errorMessage);
+            throw new WrongStatusException(errorMessage);
         }
 
         if (RocketStatus.IN_REPAIR.equals(status)) {
             final MissionEntity missionEntity = missionsDao.find(assignedMissionName)
                     .orElseThrow(() -> new NotFoundException(String.format("Mission with name %s is not present in repository.", assignedMissionName)));
             if (MissionStatus.IN_PROGRESS.equals(missionEntity.status())) {
+                log.info("Status of rocket {} will be set to \"In Repair\". Status of a mission will be set to \"PENDING\"", rocketName);
                 final MissionEntity updatedMissionEntity = missionEntity.withStatus(MissionStatus.PENDING);
                 missionsDao.save(updatedMissionEntity);
             }
@@ -106,6 +119,10 @@ public class RocketsRepositoryImpl implements RocketsRepository {
 
     private RocketEntity getRocketEntityIfPresent(String rocketName) {
         return rocketsDao.find(rocketName)
-                .orElseThrow(() -> new NotFoundException(String.format("Rocket with name %s is not present in repository.", rocketName)));
+                .orElseThrow(() -> {
+                    final String errorMessage = String.format("Rocket with name %s is not present in repository.", rocketName);
+                    log.error(errorMessage);
+                    return new NotFoundException(errorMessage);
+                });
     }
 }

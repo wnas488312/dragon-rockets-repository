@@ -1,5 +1,6 @@
 package org.wn.rockets;
 
+import lombok.extern.log4j.Log4j2;
 import org.wn.rockets.dao.InMemoryMissionsDao;
 import org.wn.rockets.dao.InMemoryRocketsDao;
 import org.wn.rockets.dao.MissionsDao;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Log4j2
 public class MissionRepositoryImpl implements MissionRepository {
     private final RocketsDao rocketsDao;
     private final MissionsDao missionsDao;
@@ -37,8 +39,11 @@ public class MissionRepositoryImpl implements MissionRepository {
      */
     @Override
     public void addNewMission(String missionName) throws AlreadyPresentInStoreException {
+        log.info("Adding new mission with name {}.", missionName);
         if (missionsDao.exists(missionName)) {
-            throw new AlreadyPresentInStoreException(String.format("Mission with name %s is already present in repository.", missionName));
+            final String errorMessage = String.format("Mission with name %s is already present in repository.", missionName);
+            log.error(errorMessage);
+            throw new AlreadyPresentInStoreException(errorMessage);
         }
 
         final MissionEntity newMissionEntity = new MissionEntity(
@@ -47,6 +52,7 @@ public class MissionRepositoryImpl implements MissionRepository {
         );
 
         missionsDao.save(newMissionEntity);
+        log.info("Mission with name {} was successfully added to repository.", missionName);
     }
 
     /**
@@ -54,24 +60,24 @@ public class MissionRepositoryImpl implements MissionRepository {
      */
     @Override
     public void changeMissionStatus(String missionName, MissionStatus status) throws NotFoundException, WrongStatusException {
+        log.info("Changing mission status with name {} to {}.", missionName, status.getStatusValue());
         final MissionEntity missionEntity = getMissionEntityIfPresent(missionName);
 
         final List<RocketEntity> rocketsByMissionName = rocketsDao.getRocketsByMissionName(missionName);
         if (MissionStatus.PENDING.equals(status) &&
                 (rocketsByMissionName.isEmpty() ||
                         rocketsByMissionName.stream().noneMatch(rocket -> RocketStatus.IN_REPAIR.equals(rocket.status())))) {
-            throw new WrongStatusException(
-                    String.format("Cannot change status to PENDING if there is no rockets assigned to mission %s", missionName));
+            throwWrongStatusException(String.format("Cannot change status to PENDING if there is no rockets assigned to mission %s", missionName));
         }
 
         if (MissionStatus.IN_PROGRESS.equals(status) &&
                 (rocketsByMissionName.isEmpty() ||
                         rocketsByMissionName.stream().anyMatch(rocket -> RocketStatus.IN_REPAIR.equals(rocket.status())))) {
-            throw new WrongStatusException(
-                    String.format("Cannot change status to IN_PROGRESS if there is no rockets assigned to mission %s or any of them is in repair", missionName));
+            throwWrongStatusException(String.format("Cannot change status to IN_PROGRESS if there is no rockets assigned to mission %s or any of them is in repair", missionName));
         }
 
         if (MissionStatus.ENDED.equals(status)) {
+            log.info("Mission with name {} ended. Rockets will unassigned.", missionName);
             for (RocketEntity rocket: rocketsByMissionName) {
                 final RocketEntity updatedRocket = rocket.withAssignedMissionName(null);
                 rocketsDao.save(updatedRocket);
@@ -80,6 +86,7 @@ public class MissionRepositoryImpl implements MissionRepository {
 
         final MissionEntity updatedMissionEntity = missionEntity.withStatus(status);
         missionsDao.save(updatedMissionEntity);
+        log.info("Status of mission with name {} changed successfully.", missionName);
     }
 
     /**
@@ -87,6 +94,7 @@ public class MissionRepositoryImpl implements MissionRepository {
      */
     @Override
     public List<MissionSummaryDto> getMissionsSummary() {
+        log.debug("Preparing summary of missions.");
         final List<MissionEntity> everyMissionPresent = missionsDao.getAll();
         final List<MissionSummaryDto> result = new ArrayList<>(everyMissionPresent.size());
         for (MissionEntity missionEntity: everyMissionPresent) {
@@ -112,6 +120,15 @@ public class MissionRepositoryImpl implements MissionRepository {
 
     private MissionEntity getMissionEntityIfPresent(String missionName) {
         return missionsDao.find(missionName)
-                .orElseThrow(() -> new NotFoundException(String.format("Mission with name %s is not present in repository.", missionName)));
+                .orElseThrow(() -> {
+                    final String errorMessage = String.format("Mission with name %s is not present in repository.", missionName);
+                    log.error(errorMessage);
+                    return new NotFoundException(errorMessage);
+                });
+    }
+
+    private void throwWrongStatusException(String errorMessage) {
+        log.error(errorMessage);
+        throw new WrongStatusException(errorMessage);
     }
 }
