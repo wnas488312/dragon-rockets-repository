@@ -11,4 +11,19 @@ public record RocketEntity(
         RocketStatus status,
         String assignedMissionName
 ) {
+    public RocketEntity withAssignedMissionName(String assignedMissionName) {
+        return new RocketEntity(
+                this.rocketName,
+                this.status,
+                assignedMissionName
+        );
+    }
+
+    public RocketEntity withStatus(RocketStatus status) {
+        return new RocketEntity(
+                this.rocketName,
+                status,
+                this.assignedMissionName
+        );
+    }
 }
